@@ -1,5 +1,8 @@
 #!/python
 #StepComm, a serial terminal emulator in Python
+#
+#Modified Oct 16, 2022 by g0tmk to add input/output queues
+#
 #Copyright (C) 2018  William B Hunter
 #
 #This program is free software: you can fgistribute it and/or modify
@@ -57,17 +60,19 @@ import re
 import sys
 import json
 import argparse
+import queue
 
 
 class pycom_tk(tk.Frame):
     
-    def __init__(self,parent=None):
+    def __init__(self,parent=None,data_from_device_q=None):
         #tk.Frame.__init__(self,parent)
         tk.Frame.__init__(self,parent)
         self.root = parent
         self.root.wm_title("StepComm - Serial Terminal Emulator in Python (C)2018 William B Hunter")
         self.grid_rowconfigure(0, weight=1) # resizable main frame
         self.grid_columnconfigure(0, weight=1) # resizable main frame
+        self.data_from_device_q = data_from_device_q # queue; bytes from device are writtem there
 
 
         #####################################
@@ -622,6 +627,13 @@ options menu allows you to change the way things are displayed."""
             inlen = self.comport.in_waiting
             if inlen > 0:
                 l = self.comport.read(inlen)
+                # write bytes from device to other thread(s)
+                if l is not None and len(l) > 0 and self.data_from_device_q:
+                    try:
+                        self.data_from_device_q.put_nowait(l)
+                    except queue.Full:
+                        print('data_from_device_q full: {} bytes dropped'.format(len(l)))
+                # write bytes from device to the screen
                 #print(f'port_in: l type={type(l)},len={len(l)}')
                 for c in l:
                     #print('port_in: char = {:02x}, rxnl style is {:s}'.format(ord(c),self.rxnl.get())) 
