@@ -1,4 +1,6 @@
-# StepComm
+# StepComm-queue
+*A [StepComm](https://github.com/skeptonomicon/StepComm) fork with extra input/output queues*
+
 Serial Terminal Emulator written in Python
   Send and recieve data from comm ports, send fixed messages with a click, send and recieve text files.
 
