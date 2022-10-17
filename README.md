@@ -1,4 +1,4 @@
-# StepComm-queue
+# StepCommQueue
 *A [StepComm](https://github.com/skeptonomicon/StepComm) fork with extra input/output queues*
 
 Serial Terminal Emulator written in Python
